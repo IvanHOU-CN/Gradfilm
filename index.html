@@ -16,8 +16,10 @@
 <script>
 /* =====================================================================
    EDIT YOUR CARD HERE
-   - {name} is replaced by the name in the link, e.g. .../?to=Anna
-   - With no name in the link, greetingNoName is used instead.
+   - {name} is replaced by the friend's name. Names come from names.js
+     (matched to the card code in the link, e.g. .../?c=k7m2),
+     or straight from the link, e.g. .../?to=Anna
+   - With no name, greetingNoName is used instead.
    ===================================================================== */
 window.CARD = {
   from: "Ivan",
@@ -29,6 +31,7 @@ window.CARD = {
   note: "So glad our paths crossed here."
 };
 </script>
+<script src="names.js"></script>
 
 <style>
   :root {
@@ -519,7 +522,10 @@ window.CARD = {
 
   /* ---------- personal touches ---------- */
   var params = new URLSearchParams(location.search);
-  var name = (params.get("to") || "").trim().slice(0, 30);
+  var NAMES = window.NAMES || {};
+  var code = (params.get("c") || "").trim().toLowerCase();
+  var fromCode = Object.prototype.hasOwnProperty.call(NAMES, code) ? String(NAMES[code] || "") : "";
+  var name = ((params.get("to") || "").trim() || fromCode.trim()).slice(0, 30);
   document.getElementById("forName").textContent = name ? "For " + name : "For you";
   document.getElementById("greet").textContent = name
     ? (C.greeting || "Happy graduation, {name}!").replace("{name}", name)
