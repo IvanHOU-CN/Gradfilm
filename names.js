@@ -4,10 +4,10 @@
 // A card with an empty name shows the general version without a name.
 // This file is public, so first names only.
 window.NAMES = {
-  "nme4": "",   // card 1
+  "nme4": "Austin",   // card 1
   "tqe6": "",   // card 2
   "zk27": "Trix",   // card 3
-  "wc46": "Kelvin",   // card 4
+  "wc46": "Kevin",   // card 4
   "35kz": "",   // card 5
   "fwd9": "",   // card 6
   "phc5": "",   // card 7
@@ -57,4 +57,4 @@ window.NAMES = {
 };
 
 // Cards that play the thank-you film instead of the classmates' one.
-window.THANKS = ["zk27", "wc46", "e6vk"];
+window.THANKS = ["nme4", "zk27", "wc46", "e6vk"];
