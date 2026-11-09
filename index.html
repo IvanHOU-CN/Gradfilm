@@ -32,6 +32,19 @@ window.CARD = {
 };
 </script>
 <script src="names.js"></script>
+<script>
+/* Cards listed in window.THANKS (in names.js) play the thank-you film instead. */
+(function () {
+  try {
+    var c = (new URLSearchParams(location.search).get("c") || "").trim().toLowerCase();
+    var list = window.THANKS || [];
+    if (c && list.indexOf(c) !== -1) {
+      document.documentElement.style.visibility = "hidden";
+      location.replace("thanks.html" + location.search);
+    }
+  } catch (e) {}
+})();
+</script>
 
 <style>
   :root {

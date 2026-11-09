@@ -20,6 +20,7 @@
     --accent-ink: #ffffff;
     --done: #f5c04a;
     --done-soft: #fdf3d6;
+    --thanks: #c2416b;
     --field: #f7f6fc;
     --display: "Shantell Sans", "Chalkboard SE", "Comic Neue", system-ui, sans-serif;
     --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -27,13 +28,13 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #0f1336; --surface: #191e4c; --ink: #f3eedf; --muted: #a9abd0; --line: #2c3268;
-      --accent: #ffe7a3; --accent-ink: #151a46; --done: #f5c04a; --done-soft: #2d2f4f; --field: #12173f;
+      --accent: #ffe7a3; --accent-ink: #151a46; --done: #f5c04a; --done-soft: #2d2f4f; --field: #12173f; --thanks: #ff9bb6;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #0f1336; --surface: #191e4c; --ink: #f3eedf; --muted: #a9abd0; --line: #2c3268;
-    --accent: #ffe7a3; --accent-ink: #151a46; --done: #f5c04a; --done-soft: #2d2f4f; --field: #12173f;
+    --accent: #ffe7a3; --accent-ink: #151a46; --done: #f5c04a; --done-soft: #2d2f4f; --field: #12173f; --thanks: #ff9bb6;
     color-scheme: dark;
   }
 
@@ -91,6 +92,11 @@
   .written { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; }
   .written input { width: 20px; height: 20px; accent-color: var(--done); }
   .name { flex: 1 1 140px; }
+  .film { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; }
+  .film input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .card.is-thanks .num { color: var(--thanks); }
+  .card.is-thanks .film { color: var(--thanks); font-weight: 700; }
+  .preview { font-size: 14px; color: var(--muted); }
   .name input { padding: 6px 10px; font-size: 15px; }
 
   button {
@@ -118,13 +124,14 @@
 <div class="wrap">
   <header style="display:grid;gap:8px">
     <h1>Card links</h1>
-    <p class="lede">One link per card. Write them now, match names later. Until a card has a name, it shows the general "Happy graduation!" version.</p>
+    <p class="lede">One link per card. Match each card to a name, and choose which film it plays: the classmates' graduation film, or the thank-you film for friends who supported you. Until a card has a name, it shows the general version without a name.</p>
   </header>
 
   <ol class="how">
     <li>Check the site address below. It fills in by itself.</li>
     <li>For each card: tap <b>Copy</b>, then in NFC Tools go to Write, Add a record, URL/URI, paste and write the tag. Pencil the card number on the card and tick <b>Written</b>.</li>
-    <li>Later, type each friend's first name next to their card number, then copy the names.js text at the bottom into GitHub.</li>
+    <li>Type each friend's first name next to their card number. For friends who aren't classmates, tick <b>Thank-you film</b>.</li>
+    <li>Copy the names.js text at the bottom and paste it into names.js on GitHub.</li>
   </ol>
 
   <label class="site" for="site">Your site address
@@ -162,18 +169,25 @@
     detected = location.host + location.pathname.replace(/\/config(\/.*)?$/i, "").replace(/\/+$/, "");
   }
   var LIVE = window.NAMES || {};
-  var state = { site: detected, written: {}, names: {}, current: null };
-  CODES.forEach(function (c) { if (LIVE[c]) state.names[c] = String(LIVE[c]); });
+  var LIVE_THANKS = window.THANKS || [];
+  var state = { site: detected, written: {}, names: {}, thanks: {}, current: null };
+  CODES.forEach(function (c) {
+    if (LIVE[c]) state.names[c] = String(typeof LIVE[c] === "object" ? LIVE[c].name || "" : LIVE[c]);
+    if (LIVE_THANKS.indexOf(c) !== -1) state.thanks[c] = true;
+  });
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || "null");
     if (saved && typeof saved === "object") {
       state.site = saved.site || state.site;
       state.written = saved.written || {};
       if (saved.names) Object.keys(saved.names).forEach(function (c) { state.names[c] = saved.names[c]; });
+      if (saved.thanks) Object.keys(saved.thanks).forEach(function (c) { if (saved.thanks[c]) state.thanks[c] = true; else delete state.thanks[c]; });
     }
   } catch (e) {}
+  var thanksSaved = {};
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || "null"); if (sv && sv.thanks) thanksSaved = sv.thanks; } catch (e) {}
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ site: state.site, written: state.written, names: state.names })); } catch (e) {}
+    try { localStorage.setItem(KEY, JSON.stringify({ site: state.site, written: state.written, names: state.names, thanks: thanksSaved })); } catch (e) {}
   }
 
   function cleanSite(v) {
@@ -196,13 +210,18 @@
       '<button type="button" class="copy" aria-label="Copy link for card ' + n + '">Copy</button></div>' +
       '<div class="bottom">' +
         '<label class="written"><input type="checkbox" id="w' + n + '"> Written</label>' +
-        '<span class="name"><input type="text" id="n' + n + '" placeholder="Name (later)" aria-label="Name for card ' + n + '" autocomplete="off"></span>' +
+        '<span class="name"><input type="text" id="n' + n + '" placeholder="Name" aria-label="Name for card ' + n + '" autocomplete="off"></span>' +
+        '<label class="film"><input type="checkbox" id="t' + n + '"> Thank-you film</label>' +
+        '<a class="preview" target="_blank" rel="noopener">Preview</a>' +
       '</div>';
     list.appendChild(li);
     var urlEl = li.querySelector(".url");
     var btn = li.querySelector(".copy");
     var chk = li.querySelector("#w" + n);
     var nameIn = li.querySelector("#n" + n);
+    var thx = li.querySelector("#t" + n);
+    var prev = li.querySelector(".preview");
+    thx.checked = !!state.thanks[code];
     chk.checked = !!state.written[code];
     nameIn.value = state.names[code] || "";
 
@@ -224,12 +243,17 @@
       if (chk.checked) state.written[code] = true; else delete state.written[code];
       save(); paint();
     });
+    thx.addEventListener("change", function () {
+      if (thx.checked) state.thanks[code] = true; else delete state.thanks[code];
+      thanksSaved[code] = thx.checked;
+      save(); paint(); writeNames();
+    });
     nameIn.addEventListener("input", function () {
       var v = nameIn.value.trim();
       if (v) state.names[code] = v; else delete state.names[code];
       save(); writeNames();
     });
-    return { code: code, li: li, urlEl: urlEl, btn: btn };
+    return { code: code, li: li, urlEl: urlEl, btn: btn, prev: prev };
   });
 
   function setCurrent(code) { state.current = code; paint(); }
@@ -246,6 +270,12 @@
         r.urlEl.innerHTML = '<span class="ph">https://your-site/?c=</span><b>' + r.code + "</b>";
       }
       r.btn.disabled = !site;
+      r.li.classList.toggle("is-thanks", !!state.thanks[r.code]);
+      if (site) {
+        var nm = state.names[r.code];
+        r.prev.href = "https://" + site + "/" + (state.thanks[r.code] ? "thanks.html" : "") + "?" + (nm ? "to=" + encodeURIComponent(nm) : "c=" + r.code);
+        r.prev.hidden = false;
+      } else { r.prev.hidden = true; }
       var w = !!state.written[r.code];
       if (w) count++;
       r.li.classList.toggle("is-done", w);
@@ -263,7 +293,7 @@
       "// Who got which card.",
       "// When you know who gets a card, type their first name between the quotes.",
       "// Example:  \"k7m2\": \"Anna\",   // card 1",
-      "// A card with an empty name shows the general \"Happy graduation!\" version.",
+      "// A card with an empty name shows the general version without a name.",
       "// This file is public, so first names only.",
       "window.NAMES = {"
     ];
@@ -272,9 +302,14 @@
       lines.push("  \"" + code + "\": " + JSON.stringify(nm) + (i < CODES.length - 1 ? "," : "") + "   // card " + (i + 1));
     });
     lines.push("};");
+    var tlist = CODES.filter(function (c) { return state.thanks[c]; });
+    lines.push("");
+    lines.push("// Cards that play the thank-you film instead of the classmates' one.");
+    lines.push("window.THANKS = [" + tlist.map(function (c) { return "\"" + c + "\""; }).join(", ") + "];");
     document.getElementById("namesOut").value = lines.join("\n") + "\n";
     var filled = Object.keys(state.names).length;
-    document.getElementById("namesStatus").textContent = filled ? filled + " of " + CODES.length + " cards have a name" : "No names yet";
+    document.getElementById("namesStatus").textContent = (filled ? filled + " of " + CODES.length + " cards have a name" : "No names yet") +
+      (tlist.length ? ", " + tlist.length + " thank-you" : "");
   }
 
   siteInput.addEventListener("input", function () { state.site = siteInput.value; save(); paint(); });
