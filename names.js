@@ -1,18 +1,18 @@
 // Who got which card.
 // When you know who gets a card, type their first name between the quotes.
 // Example:  "k7m2": "Anna",   // card 1
-// A card with an empty name shows the general "Happy graduation!" version.
+// A card with an empty name shows the general version without a name.
 // This file is public, so first names only.
 window.NAMES = {
   "nme4": "",   // card 1
   "tqe6": "",   // card 2
-  "zk27": "",   // card 3
-  "wc46": "",   // card 4
+  "zk27": "Trix",   // card 3
+  "wc46": "Kelvin",   // card 4
   "35kz": "",   // card 5
   "fwd9": "",   // card 6
   "phc5": "",   // card 7
   "7fhu": "",   // card 8
-  "e6vk": "",   // card 9
+  "e6vk": "Yi",   // card 9
   "zvs6": "",   // card 10
   "dsk6": "",   // card 11
   "tfh6": "",   // card 12
@@ -55,3 +55,6 @@ window.NAMES = {
   "peu3": "",   // card 49
   "qnk3": ""   // card 50
 };
+
+// Cards that play the thank-you film instead of the classmates' one.
+window.THANKS = ["zk27", "wc46", "e6vk"];
