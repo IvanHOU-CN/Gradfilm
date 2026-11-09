@@ -272,6 +272,11 @@ window.CARD = {
           <stop offset="0" stop-color="#0c1034"/>
           <stop offset="1" stop-color="#262e6c"/>
         </linearGradient>
+        <linearGradient id="gDeskShade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3a2212" stop-opacity=".22"/>
+          <stop offset=".25" stop-color="#3a2212" stop-opacity="0"/>
+          <stop offset="1" stop-color="#3a2212" stop-opacity=".28"/>
+        </linearGradient>
         <radialGradient id="gHalo">
           <stop offset="0" stop-color="#ffe7a3" stop-opacity=".85"/>
           <stop offset="1" stop-color="#ffe7a3" stop-opacity="0"/>
@@ -363,14 +368,16 @@ window.CARD = {
       <path d="M0,528 L400,528 L400,546 L0,546 Z" fill="#c98f5a"/>
       <rect y="546" width="400" height="154" fill="#9d6a3e"/>
       <rect y="546" width="400" height="5" fill="#7d5130"/>
-      <g fill="#a8744a" stroke="#7d5130" stroke-width="2">
-        <rect x="34" y="572" width="152" height="58" rx="5"/>
-        <rect x="214" y="572" width="152" height="58" rx="5"/>
+      <!-- the back panel of the desk: wood grain and a soft shadow -->
+      <g fill="none" stroke="#83552f" stroke-width="1.4" stroke-linecap="round" opacity=".45">
+        <path d="M-4,574 C60,569 120,580 190,575 S300,568 404,576"/>
+        <path d="M-4,604 C70,610 140,598 220,604 S330,612 404,602"/>
+        <path d="M30,636 C90,630 150,641 230,635 S340,629 404,637"/>
+        <path d="M-4,668 C80,674 170,662 250,668 S350,674 404,666"/>
+        <ellipse cx="292" cy="620" rx="13" ry="4.5"/>
+        <ellipse cx="292" cy="620" rx="6" ry="1.8"/>
       </g>
-      <g fill="#e2b07a" stroke="#7d5130" stroke-width="1.5">
-        <circle cx="110" cy="601" r="5"/>
-        <circle cx="290" cy="601" r="5"/>
-      </g>
+      <rect y="551" width="400" height="149" fill="url(#gDeskShade)"/>
       <path d="M0,528 L400,528" stroke="#e2b07a" stroke-width="1.5"/>
 
       <!-- on the desk -->
